@@ -1,0 +1,604 @@
+/* ─── Page ────────────────────────────────────────────── */
+.page {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: #fbf9f4;
+  color: #2d3d35;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ─── Nav ─────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background-color: rgba(252, 250, 245, 0.85);
+  backdrop-filter: blur(20px);
+}
+
+.navInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+  padding: 0 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.wordmark {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #2d3d35;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.navLinkActive {
+  color: #2d3d35;
+  text-decoration: none;
+  border-bottom: 2px solid #445d48;
+  padding-bottom: 2px;
+}
+
+.navLink {
+  color: #5a6b5d;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.navLink:hover {
+  color: #2d3d35;
+}
+
+.navDot {
+  color: #5a6b5d;
+  opacity: 0.4;
+}
+
+.avatarBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #f0eee1;
+  border: 1px solid rgba(187, 186, 172, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.avatarBtn:hover {
+  background: #eae9d9;
+}
+
+.avatarIcon {
+  font-size: 1rem;
+}
+
+/* ─── Dot line ────────────────────────────────────────── */
+.dotLineWrapper {
+  position: absolute;
+  top: 5rem;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  padding-bottom: 1.5rem;
+}
+
+.dotLineTrack {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.timelineGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.timelineNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.timelineDotLarge {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #2d3d35;
+}
+
+.timelineLabel {
+  position: absolute;
+  top: 100%;
+  margin-top: 0.375rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #2d3d35;
+}
+
+.timelineDot {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: rgba(56, 57, 46, 0.3);
+}
+
+/* ─── Main ────────────────────────────────────────────── */
+.main {
+  position: relative;
+  z-index: 10;
+  padding: 6rem 1.5rem 8rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
+
+/* ─── Header ──────────────────────────────────────────── */
+.header {
+  margin-bottom: 3rem;
+}
+
+.pageTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #2d3d35;
+  margin: 0 0 1rem;
+}
+
+.titleRule {
+  width: 100%;
+  height: 2px;
+  background: #2d3d35;
+  margin-bottom: 1rem;
+}
+
+.pageSubtitle {
+  font-size: 1.125rem;
+  color: #5a6b5d;
+  margin: 0;
+}
+
+/* ─── Layout ──────────────────────────────────────────── */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.leftCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 20rem;
+    flex-shrink: 0;
+  }
+}
+
+/* ─── Cards ───────────────────────────────────────────── */
+.card {
+  background: #f6f4e8;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cardDimmed {
+  opacity: 0.6;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.cardHeaderRow .cardHeader {
+  margin-bottom: 0;
+}
+
+.cardIcon {
+  font-size: 1.25rem;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3d35;
+  margin: 0;
+}
+
+/* ─── Tabs ────────────────────────────────────────────── */
+.tabRow {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  background: #fcf9f0;
+  border: 1px solid rgba(187, 186, 172, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tabActive {
+  background: #f0eee1;
+  border: 2px solid #445d48;
+}
+
+.tabDisabled {
+  opacity: 0.4;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+.tabDashed {
+  border: 1px dashed rgba(187, 186, 172, 0.4);
+  cursor: not-allowed;
+}
+
+.tabLabel {
+  font-weight: 700;
+  color: #2d3d35;
+  font-size: 0.9375rem;
+}
+
+.tabLabelMuted {
+  font-size: 0.875rem;
+  color: #5a6b5d;
+  font-style: italic;
+}
+
+.tabStatus {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #445d48;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* ─── Fields ──────────────────────────────────────────── */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5a6b5d;
+  padding: 0 0.25rem;
+}
+
+.pathField {
+  background: #f0eee1;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #445d48;
+}
+
+.pathText {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  color: #445d48;
+  flex: 1;
+}
+
+.folderIcon {
+  font-size: 1rem;
+  margin-left: auto;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .inputGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.input {
+  width: 100%;
+  background: #f0eee1;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  color: #2d3d35;
+  border: none;
+  border-bottom: 2px solid transparent;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus {
+  border-bottom-color: #445d48;
+}
+
+/* ─── Coming Soon badge ───────────────────────────────── */
+.comingSoonBadge {
+  background: #d9a777;
+  color: #482904;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ─── CTA ─────────────────────────────────────────────── */
+.ctaRow {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.syncBtn {
+  background: #445d48;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 8px 24px rgba(68, 93, 72, 0.1);
+  transition: opacity 0.2s, transform 0.1s;
+}
+.syncBtn:hover { opacity: 0.9; }
+.syncBtn:active { transform: scale(0.98); }
+
+.syncIcon {
+  font-size: 1.25rem;
+  display: inline-block;
+  transition: transform 0.5s;
+}
+.syncBtn:hover .syncIcon {
+  transform: rotate(180deg);
+}
+
+/* ─── Sidebar cards ───────────────────────────────────── */
+.sidebarTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d3d35;
+  margin: 0 0 1rem;
+}
+
+.readinessList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.readinessItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkReady {
+  color: #445d48;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.checkPending {
+  color: rgba(101, 101, 89, 0.4);
+  font-size: 1rem;
+}
+
+.readinessLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2d3d35;
+  margin: 0;
+}
+
+.readinessLabelMuted {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5a6b5d;
+  margin: 0;
+}
+
+.readinessStatus {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #445d48;
+  margin: 0;
+}
+
+.readinessStatusMuted {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #5a6b5d;
+  margin: 0;
+}
+
+.privacyCard {
+  background: #445d48;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  color: white;
+}
+
+.privacyIcon {
+  font-size: 1.25rem;
+}
+
+.privacyTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.privacyText {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.checkCircle {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: #445d48;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.checkCircle::after {
+  content: "✓";
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.privacyShield {
+  font-size: 1.25rem;
+  filter: grayscale(1) brightness(10);
+}
+
+/* ─── Footer ──────────────────────────────────────────── */
+.footer {
+  background: #fbf9f4;
+  padding: 3rem 0;
+  margin-top: auto;
+}
+
+.footerInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .footerInner {
+    flex-direction: row;
+  }
+}
+
+.footerBrand {
+  font-weight: 700;
+  color: #2d3d35;
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.footerSub {
+  color: #445d48;
+  font-weight: 300;
+  margin: 0;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footerLinks a {
+  color: #5a6b5d;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footerLinks a:hover {
+  color: #445d48;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
