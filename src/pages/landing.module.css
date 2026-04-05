@@ -1,7 +1,7 @@
 /* ─── Globals ─────────────────────────────────────────── */
 .page {
   font-family: "Plus Jakarta Sans", sans-serif;
-  background-color: #fbf9f4;
+  background-color: #f0ede6;
   color: #2d3d35;
   min-height: 100vh;
 }
@@ -12,7 +12,7 @@
   top: 0;
   width: 100%;
   z-index: 50;
-  background-color: rgba(251, 249, 244, 0.85);
+  background-color: rgba(240, 237, 230, 0.85);
   backdrop-filter: blur(20px);
 }
 
@@ -20,9 +20,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 4rem;
+  padding: 0 1.5rem;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
 }
 
 .wordmark {
@@ -31,6 +32,48 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #2d3d35;
+  text-decoration: none;
+}
+
+.wordmarkLink {
+  text-decoration: none;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLeft > a {
+  text-decoration: none;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.navLink {
+  color: #5a6b5d;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.navLink:hover { color: #2d3d35; }
+
+.navLinkActive {
+  color: #2d3d35;
+  text-decoration: none;
+  border-bottom: 2px solid #445d48;
+  padding-bottom: 2px;
+}
+
+.navDot {
+  color: #5a6b5d;
+  opacity: 0.4;
 }
 
 .navActions {
@@ -144,7 +187,7 @@
 /* ─── Timeline background ─────────────────────────────── */
 .timelineBg {
   position: absolute;
-  top: 45%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 300%;
@@ -157,12 +200,12 @@
   z-index: 0;
   opacity: 0.3;
   mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-  animation: driftRight 30s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
-@keyframes driftRight {
+@keyframes marquee {
   0% { transform: translate(-50%, -50%); }
-  100% { transform: translate(-45%, -50%); }
+  100% { transform: translate(-55%, -50%); }
 }
 
 .timelineDot {

@@ -1,6 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./ask.module.css";
 import ReactMarkdown from "react-markdown";
+import profile from "../profile.js";
+import NavAvatar from "../components/NavAvatar";
 
 const TIMELINE_ITEMS = [
   "note",
@@ -11,17 +14,12 @@ const TIMELINE_ITEMS = [
   "transcript",
 ];
 
-const userProfile = {
-  name: "Mordecai",
-  github: "mordecai-xyz",
-  focus: "Launch School Capstone — RAG, embeddings, vector search",
-};
 
 function DotLine() {
   return (
     <div className={styles.dotLineWrapper}>
       <div className={styles.dotLineTrack}>
-        {[...TIMELINE_ITEMS, ...TIMELINE_ITEMS].map((label, i) => (
+        {Array.from({ length: 8 }, () => TIMELINE_ITEMS).flat().map((label, i) => (
           <div key={i} className={styles.timelineGroup}>
             <div className={styles.timelineDot} />
             <div className={styles.timelineDot} />
@@ -38,6 +36,32 @@ function DotLine() {
   );
 }
 
+function NoteModal({ source, onClose }) {
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div className={styles.modalBackdrop} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>{source.filename}</h2>
+          <button className={styles.modalClose} onClick={onClose}>✕</button>
+        </div>
+        <div className={styles.modalBody}>
+          <div className={styles.modalText}>
+            <ReactMarkdown>{source.text}</ReactMarkdown>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SourceBadge({ type }) {
   const cls =
     {
@@ -48,9 +72,9 @@ function SourceBadge({ type }) {
   return <span className={`${styles.badge} ${cls}`}>{type}</span>;
 }
 
-function SourceCard({ source }) {
+function SourceCard({ source, onViewNote }) {
   const type = source.type || "REMNOTE";
-  const viewLabel = type === "GITHUB" ? "View Commit" : "View Note";
+  const viewLabel = type === "GITHUB" ? "View Commit" : type === "TRANSCRIPTS" ? "View Transcript" : "View Note";
   return (
     <div className={styles.sourceCard}>
       <div className={styles.sourceCardTop}>
@@ -67,13 +91,31 @@ function SourceCard({ source }) {
         <span className={styles.sourceLinkIcon}>
           {type === "GITHUB" ? "<>" : "↗"}
         </span>
-        {viewLabel}
+        {type === "GITHUB" ? (
+          (() => {
+            const parts = (source.filename || "").split("_");
+            // Format: mordcole_reponame_commithash
+            // parts[0] = username, parts[last] = commit hash, parts[1..n-1] = repo name
+            const hash = parts[parts.length - 1];
+            const repo = parts.slice(1, parts.length - 1).join("-");
+            const url = `https://github.com/mordcole/${repo}/commit/${hash}`;
+            return (
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                {viewLabel}
+              </a>
+            );
+          })()
+        ) : (
+          <button className={styles.viewNoteBtn} onClick={() => onViewNote(source)}>
+            {viewLabel}
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-function Message({ message }) {
+function Message({ message, onViewNote }) {
   const isUser = message.role === "user";
   return (
     <div
@@ -88,6 +130,14 @@ function Message({ message }) {
         <div className={styles.messageText}>
           <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
+        {/* Coverage callout */}
+        {!isUser && message.mode === "learning" && message.coverage && (
+          <div className={`${styles.coverageCallout} ${styles[`coverage_${message.coverage}`]}`}>
+            {message.coverage === "well_covered" && "✦ Well documented in your sources"}
+            {message.coverage === "partial" && "◑ Partially covered in your sources"}
+            {message.coverage === "missing" && "○ Not in your sources yet"}
+          </div>
+        )}
         {/* Source cards below assistant messages */}
         {!isUser && message.sources && message.sources.length > 0 && (
           <div className={styles.sourcesSection}>
@@ -99,7 +149,7 @@ function Message({ message }) {
             </div>
             <div className={styles.sourceGrid}>
               {message.sources.map((s, i) => (
-                <SourceCard key={i} source={s} />
+                <SourceCard key={i} source={s} onViewNote={onViewNote} />
               ))}
             </div>
           </div>
@@ -109,12 +159,56 @@ function Message({ message }) {
   );
 }
 
+export function buildSystemPrompt(profile) {
+  const roleClause = profile.role ? `, a ${profile.role}` : "";
+  const focusClause = profile.focus ? ` currently focused on ${profile.focus}` : "";
+  const githubClause = profile.github_username ? ` (GitHub: ${profile.github_username})` : "";
+  const base = `You are a learning assistant for ${profile.name}${roleClause}${focusClause}${githubClause}. Tailor your responses to their context and goals. Help them explore connections between their notes, commits, and transcripts.`;
+
+  const styleMap = {
+    "software engineering student": `Your responses should be thorough and educational. Define terms before using them. Explain the 'why' before the 'how'. Make connections explicit and celebrate progress. Treat the user as someone building foundational understanding — depth and clarity matter more than brevity.`,
+    "working developer": `Your responses should be direct and dense. Skip fundamentals, assume fluency. Lead with trade-offs and production implications. Use precise technical vocabulary without explanation. Treat the user as a peer — get to the point.`,
+    "career changer": `Your responses should bridge from general programming experience into new concepts. Use analogies to adjacent domains. Emphasize transferable patterns and the 'why' before the 'how'. Balance encouragement with technical precision.`,
+  };
+
+  const styleInstruction = profile.role ? styleMap[profile.role.toLowerCase()] : null;
+  return styleInstruction ? `${base}\n\n${styleInstruction}` : base;
+}
+
 export default function Ask() {
+  const { pathname } = useLocation();
+  const lsProfile = (() => { try { const r = localStorage.getItem("ic_profile"); return r ? JSON.parse(r) : null; } catch { return null; } })();
   const [messages, setMessages] = useState([]);
   const [history, setHistory] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [activeNote, setActiveNote] = useState(null);
+  const [showPrompt, setShowPrompt] = useState(false);
   const bottomRef = useRef(null);
+  const chipRef = useRef(null);
+  const popoverRef = useRef(null);
+  const typingIntervalRef = useRef(null);
+
+  const handleCloseModal = useCallback(() => setActiveNote(null), []);
+
+  useEffect(() => {
+    if (!showPrompt) return;
+    function handleClickOutside(e) {
+      if (
+        popoverRef.current && !popoverRef.current.contains(e.target) &&
+        chipRef.current && !chipRef.current.contains(e.target)
+      ) {
+        setShowPrompt(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showPrompt]);
+
+  // Clear typing interval on unmount
+  useEffect(() => {
+    return () => { if (typingIntervalRef.current) clearInterval(typingIntervalRef.current); };
+  }, []);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -135,29 +229,47 @@ export default function Ask() {
       const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, history }),
+        body: JSON.stringify({ query, history: history.length === 0 ? [{ role: "system", content: buildSystemPrompt(profile) }] : history }),
       });
 
       const data = await res.json();
-      const assistantMsg = {
-        role: "assistant",
-        content: data.answer,
-        sources: data.sources || [],
-      };
+      const words = data.answer.split(" ");
 
-      setMessages((prev) => [...prev, assistantMsg]);
+      const sources = data.sources || [];
+      const mode = data.mode || "learning";
+      const coverage = data.coverage || null;
+
+      // Add message with empty content and no sources yet
+      setMessages((prev) => [...prev, { role: "assistant", content: "", sources: [], mode, coverage }]);
       setHistory(data.history);
+
+      // Reveal words one at a time; hide loading dots on the first tick; add sources after last word
+      let wordIndex = 0;
+      typingIntervalRef.current = setInterval(() => {
+        wordIndex++;
+        const revealed = words.slice(0, wordIndex).join(" ");
+        const done = wordIndex >= words.length;
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            ...updated[updated.length - 1],
+            content: revealed,
+            ...(done && { sources }),
+          };
+          return updated;
+        });
+        if (wordIndex === 1) setLoading(false);
+        if (done) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
+      }, 25);
+
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content:
-            "Something went wrong connecting to the backend. Is the FastAPI server running?",
-          sources: [],
-        },
+        { role: "assistant", content: "Something went wrong connecting to the backend. Is the FastAPI server running?", sources: [] },
       ]);
-    } finally {
       setLoading(false);
     }
   }
@@ -171,26 +283,41 @@ export default function Ask() {
 
   return (
     <div className={styles.page}>
+      {activeNote && <NoteModal source={activeNote} onClose={handleCloseModal} />}
       {/* Nav */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <div className={styles.navLeft}>
-            <span className={styles.wordmark}>I / C</span>
+            <Link to="/"><span className={styles.wordmark}>I / C</span></Link>
             <div className={styles.navLinks}>
-              <a href="#" className={styles.navLink}>
-                Connect
-              </a>
+              <Link to="/connect" className={pathname === "/connect" ? styles.navLinkActive : styles.navLink}>Connect</Link>
               <span className={styles.navDot}>·</span>
-              <a href="#" className={styles.navLink}>
-                Sync
-              </a>
+              <Link to="/sync" className={pathname === "/sync" ? styles.navLinkActive : styles.navLink}>Sync</Link>
               <span className={styles.navDot}>·</span>
-              <a href="#" className={styles.navLinkActive}>
-                Ask
-              </a>
+              <Link to="/ask" className={pathname === "/ask" ? styles.navLinkActive : styles.navLink}>Ask</Link>
             </div>
           </div>
-          <button className={styles.avatarBtn}>👤</button>
+          <div className={styles.navRight}>
+            {lsProfile && (
+              <div className={styles.sessionChipWrapper}>
+                <button
+                  ref={chipRef}
+                  className={styles.sessionChip}
+                  onClick={() => setShowPrompt((p) => !p)}
+                >
+                  ✦ {lsProfile.role}{lsProfile.focus ? ` · focused on ${lsProfile.focus}` : ""}
+                  <span className={styles.chipIcon}>ⓘ</span>
+                </button>
+                {showPrompt && (
+                  <div ref={popoverRef} className={styles.promptPopover}>
+                    <p className={styles.promptPopoverLabel}>Active system prompt</p>
+                    <pre className={styles.promptPopoverText}>{buildSystemPrompt(lsProfile)}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+            <NavAvatar />
+          </div>
         </div>
       </nav>
 
@@ -202,7 +329,7 @@ export default function Ask() {
           <h1 className={styles.pageTitle}>Ask</h1>
           <div className={styles.titleRule} />
           <p className={styles.pageSubtitle}>
-            Query across your notes and commits.
+            Query across your notes, commits, and transcripts.
           </p>
         </div>
       </div>
@@ -213,7 +340,7 @@ export default function Ask() {
           {messages.length === 0 && (
             <div className={styles.emptyState}>
               <p className={styles.emptyTitle}>
-                Ask anything about your notes and code.
+                Ask anything about your notes, code, and transcripts.
               </p>
               <p className={styles.emptySubtitle}>
                 Try: "What have I written about closures?" or "How did I
@@ -222,7 +349,7 @@ export default function Ask() {
             </div>
           )}
           {messages.map((msg, i) => (
-            <Message key={i} message={msg} />
+            <Message key={i} message={msg} onViewNote={setActiveNote} />
           ))}
           {loading && (
             <div className={`${styles.message} ${styles.messageAssistant}`}>

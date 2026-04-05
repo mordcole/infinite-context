@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "./Landing.module.css";
+import NavAvatar from "../components/NavAvatar";
 
 function SourceBadge({ type }) {
   const badgeClass = {
@@ -11,7 +13,10 @@ function SourceBadge({ type }) {
 }
 
 export default function Landing() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const timelineRef = useRef(null);
+  const [isLoggedIn] = useState(() => !!localStorage.getItem("ic_profile"));
 
   useEffect(() => {
     const bg = timelineRef.current;
@@ -47,10 +52,27 @@ export default function Landing() {
       {/* Nav */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
-          <span className={styles.wordmark}>I / C</span>
+          <div className={styles.navLeft}>
+            <Link to="/" className={styles.wordmarkLink}><span className={styles.wordmark}>I / C</span></Link>
+            {isLoggedIn && (
+              <div className={styles.navLinks}>
+                <Link to="/connect" className={pathname === "/connect" ? styles.navLinkActive : styles.navLink}>Connect</Link>
+                <span className={styles.navDot}>·</span>
+                <Link to="/sync" className={pathname === "/sync" ? styles.navLinkActive : styles.navLink}>Sync</Link>
+                <span className={styles.navDot}>·</span>
+                <Link to="/ask" className={pathname === "/ask" ? styles.navLinkActive : styles.navLink}>Ask</Link>
+              </div>
+            )}
+          </div>
           <div className={styles.navActions}>
-            <button className={styles.signInBtn}>Sign In</button>
-            <button className={styles.getStartedBtn}>Get Started</button>
+            {isLoggedIn ? (
+              <>
+                <button className={styles.getStartedBtn} onClick={() => navigate("/ask")}>Go to Ask →</button>
+                <NavAvatar />
+              </>
+            ) : (
+              <button className={styles.getStartedBtn} onClick={() => navigate("/onboarding")}>Get Started</button>
+            )}
           </div>
         </div>
       </nav>
@@ -76,10 +98,9 @@ export default function Landing() {
               — three sources of learning, unified.
             </p>
             <div className={styles.heroCtas}>
-              <button className={styles.primaryBtn}>
-                Get Started <span className={styles.arrow}>→</span>
+              <button className={styles.primaryBtn} onClick={() => navigate(isLoggedIn ? "/ask" : "/onboarding")}>
+                {isLoggedIn ? "Go to Ask" : "Get Started"} <span className={styles.arrow}>→</span>
               </button>
-              <button className={styles.secondaryBtn}>View Documentation</button>
             </div>
           </div>
 
@@ -181,7 +202,7 @@ export default function Landing() {
           <h2 className={styles.ctaTitle}>
             Ready to bridge the gap between what you learn and what you remember?
           </h2>
-          <button className={styles.ctaBtn}>Get Started</button>
+          <button className={styles.ctaBtn} onClick={() => navigate(isLoggedIn ? "/ask" : "/onboarding")}>{isLoggedIn ? "Go to Ask →" : "Get Started"}</button>
         </section>
       </main>
 
@@ -191,16 +212,11 @@ export default function Landing() {
           <div>
             <p className={styles.footerBrand}>Infinite Context</p>
             <p className={styles.footerSub}>
-              © 2024 Infinite Context. Built for developer learning.
+              © 2026 Infinite Context. Built for developer learning.
             </p>
           </div>
           <div className={styles.footerLinks}>
-            <a href="#">Documentation</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">GitHub</a>
-            <span className={styles.footerDivider} />
-            <a href="#" className={styles.footerSignIn}>Sign In</a>
+            <a href="https://github.com/mordcole" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
       </footer>

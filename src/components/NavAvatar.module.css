@@ -1,0 +1,88 @@
+/* ─── Wrapper ─────────────────────────────────────────── */
+.wrapper {
+  position: relative;
+}
+
+/* ─── Avatar button ───────────────────────────────────── */
+.avatarBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #445d48;
+  color: #edfdf4;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+.avatarBtn:hover { opacity: 0.85; }
+
+/* ─── Dropdown ────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: #fbf9f4;
+  border: 1px solid rgba(176, 178, 177, 0.3);
+  border-radius: 0.625rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+/* ─── Profile section ─────────────────────────────────── */
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.125rem;
+}
+
+.name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #2d3d35;
+}
+
+.username {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: #2d3d35;
+}
+
+.role {
+  font-size: 0.8125rem;
+  color: #5a6b5d;
+  margin-top: 0.125rem;
+}
+
+/* ─── Divider ─────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: rgba(176, 178, 177, 0.3);
+  margin: 0;
+}
+
+/* ─── Sign out ────────────────────────────────────────── */
+.signOutBtn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.125rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2d3d35;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.signOutBtn:hover { background: rgba(68, 93, 72, 0.07); }
